@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Medicamentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Sistema de Medicamentos</h2>
+        
+        <div class="section text-center">
+            <button id="btnIniciar" class="btn btn-primary">Iniciar Sistema</button>
+            <button id="btnDetener" class="btn btn-danger">Detener Sistema</button>
+        </div>
+        
+        <div id="inputContainer" class="section">
+            <h4>Ingresar Existencias</h4>
+            <div class="mb-3">
+                <label>Medicamento 1:</label>
+                <input type="number" id="m1" placeholder="Cantidad">
+            </div>
+            <div class="mb-3">
+                <label>Medicamento 2:</label>
+                <input type="number" id="m2" placeholder="Cantidad">
+            </div>
+            <button id="btnEnviarCantidad" class="btn btn-success">Guardar Existencias</button>
+        </div>
+        
+        <div id="inventario" class="section">
+            <h4>Inventario Actual</h4>
+            <p>Medicamento 1: <span id="inv1">0</span> unidades</p>
+            <p>Medicamento 2: <span id="inv2">0</span> unidades</p>
+        </div>
+        
+        <div id="presiones" class="section">
+            <h4>Registrar Paciente</h4>
+            <div class="mb-3">
+                <label>Presión Sistólica:</label>
+                <input type="number" id="ps" placeholder="Ej: 120">
+            </div>
+            <div class="mb-3">
+                <label>Presión Diastólica:</label>
+                <input type="number" id="pd" placeholder="Ej: 80">
+            </div>
+            <button id="btnEnviarPaciente" class="btn btn-primary">Registrar Paciente</button>
+        </div>
+        
+        <div class="resultados">
+            <h4>Estadísticas</h4>
+            <p>Pacientes atendidos: <span id="totalAtendidos">0</span></p>
+            <p>Medicamento 1 entregados: <span id="entregados1">0</span></p>
+            <p>Medicamento 2 entregados: <span id="entregados2">0</span></p>
+            <p>Porcentaje Medicamento 1: <span id="porcentaje1">0</span>%</p>
+            <p>Porcentaje Medicamento 2: <span id="porcentaje2">0</span>%</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let totalAtendidos = 0;
+        let entregados1 = 0;
+        let entregados2 = 0;
+        let inventario = { m1: 0, m2: 0 };
+        
+        // Elementos del DOM
+        const btnIniciar = document.getElementById('btnIniciar');
+        const btnDetener = document.getElementById('btnDetener');
+        const inputContainer = document.getElementById('inputContainer');
+        const inventarioDiv = document.getElementById('inventario');
+        const presionesDiv = document.getElementById('presiones');
+        
+        // Inicialmente ocultamos algunas secciones
+        inputContainer.style.display = 'none';
+        inventarioDiv.style.display = 'none';
+        presionesDiv.style.display = 'none';
+        
+        // Event Listeners
+        btnIniciar.addEventListener('click', () => {
+            inputContainer.style.display = 'block';
+            btnIniciar.disabled = true;
+        });
+        
+        btnDetener.addEventListener('click', () => {
+            location.reload(); // Reiniciamos todo
+        });
+        
+        document.getElementById('btnEnviarCantidad').addEventListener('click', () => {
+            inventario.m1 = parseInt(document.getElementById('m1').value) || 0;
+            inventario.m2 = parseInt(document.getElementById('m2').value) || 0;
+            
+            document.getElementById('inv1').textContent = inventario.m1;
+            document.getElementById('inv2').textContent = inventario.m2;
+            
+            inputContainer.style.display = 'none';
+            inventarioDiv.style.display = 'block';
+            presionesDiv.style.display = 'block';
+        });
+        
+        document.getElementById('btnEnviarPaciente').addEventListener('click', () => {
+            const ps = parseInt(document.getElementById('ps').value);
+            const pd = parseInt(document.getElementById('pd').value);
+            
+            if (isNaN(ps) || isNaN(pd)) {
+                alert('Por favor ingresa valores válidos para las presiones');
+                return;
+            }
+            
+            // Lógica de tratamiento simplificada
+            if (ps > 160 && pd < 90 && inventario.m1 >= 17) {
+                entregados1++;
+                inventario.m1 -= 17;
+            } 
+            else if (ps < 70 && pd < 50 && inventario.m2 >= 6) {
+                entregados2++;
+                inventario.m2 -= 6;
+            }
+            else if (ps >= 140 || pd >= 90) {
+                if (inventario.m1 >= 2) {
+                    entregados1++;
+                    inventario.m1 -= 2;
+                }
+            }
+            
+            totalAtendidos++;
+            
+            // Actualizar estadísticas
+            document.getElementById('totalAtendidos').textContent = totalAtendidos;
+            document.getElementById('entregados1').textContent = entregados1;
+            document.getElementById('entregados2').textContent = entregados2;
+            document.getElementById('porcentaje1').textContent = 
+                totalAtendidos > 0 ? ((entregados1 / totalAtendidos) * 100).toFixed(2) : 0;
+            document.getElementById('porcentaje2').textContent = 
+                totalAtendidos > 0 ? ((entregados2 / totalAtendidos) * 100).toFixed(2) : 0;
+            
+            // Actualizar inventario
+            document.getElementById('inv1').textContent = inventario.m1;
+            document.getElementById('inv2').textContent = inventario.m2;
+            
+            // Limpiar inputs
+            document.getElementById('ps').value = '';
+            document.getElementById('pd').value = '';
+        });
+    </script>
+</body>
+</html>
